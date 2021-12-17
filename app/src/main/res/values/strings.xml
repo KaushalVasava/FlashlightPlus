@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Flashlight Plus</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="turn_on_and_off_light">Turn on and off light</string>
+    <string name="feedback_email">kaushalvasava.app.feedback@gmail.com</string>
+    <string name="sos">SOS</string>
+    <string name="big_flash_disable">Big flash as switch is disable</string>
+    <string name="big_flash_enable">Big flash as switch is enable</string>
+    <string name="flash_off_at_start">Flash OFF at start up</string>
+    <string name="flash_on_at_start">Flash ON at start up</string>
+    <string name="touch_sound_disable">Touch sound is disable</string>
+    <string name="touch_sound_enable">Touch sound is enable</string>
+    <string name="haptic_feedback_disable">Haptic feedback is disable</string>
+    <string name="haptic_feedback_enable">Haptic feedback is enable</string>
+    <string-array name="time_list">
+        <item>1 Minute</item>
+        <item>2 Minute</item>
+        <item>5 Minute</item>
+        <item>10 Minute</item>
+        <item>15 Minute</item>
+        <item>30 Minute</item>
+    </string-array>
+</resources>
