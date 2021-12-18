@@ -5,7 +5,7 @@
     android:id="@+id/sos_dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="10dp">
+   >
 
     <TextView
         android:id="@+id/header_title"
@@ -30,7 +30,7 @@
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/big_flash_btn">
+        app:layout_constraintTop_toBottomOf="@id/shake_to_light">
 
         <!--this is the actual edit text which takes the input-->
         <com.google.android.material.textfield.TextInputEditText
@@ -81,54 +81,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@id/sos_name"
+        app:layout_constraintBottom_toTopOf="@id/shake_to_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/start_flash" />
 
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/second_name"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_margin="16dp"-->
-    <!--        android:hint="Enter Second Number"-->
-    <!--        app:endIconMode="clear_text"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/sos_name">-->
-
-    <!--        &lt;!&ndash;this is the actual edit text which takes the input&ndash;&gt;-->
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:id="@+id/second_number"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:inputType="phone"-->
-    <!--            android:maxLength="10" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/third_name"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_margin="16dp"-->
-    <!--        android:hint="Enter Third Number"-->
-    <!--        app:endIconMode="clear_text"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/second_name">-->
-
-    <!--        &lt;!&ndash;this is the actual edit text which takes the input&ndash;&gt;-->
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:id="@+id/third_number"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:inputType="phone"-->
-    <!--            android:maxLength="10" />-->
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/shake_to_light"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@id/sos_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/big_flash_btn" />
 
     <Button
         android:id="@+id/addBtn"

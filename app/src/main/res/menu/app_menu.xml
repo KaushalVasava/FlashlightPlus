@@ -3,36 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/app_manager"
-        android:title="SOS settings"
+        android:title="@string/settings"
         app:showAsAction="never" />
-<!--    <item-->
-<!--        android:id="@+id/haptic_feedback"-->
-<!--        android:title="Haptic Feedback"-->
-<!--        app:showAsAction="never"-->
-<!--        android:checkable="true"-->
-<!--        android:checked="true"-->
-<!--        />-->
-<!--    <item-->
-<!--        android:id="@+id/sound_feedback"-->
-<!--        android:title="Touch Sound"-->
-<!--        app:showAsAction="never"-->
-<!--        android:checkable="true"-->
-<!--        android:checked="false"-->
-<!--        />-->
     <item
         android:id="@+id/more_apps"
-        android:title="More Apps"
+        android:title="@string/more_apps"
         app:showAsAction="never" />
     <item
         android:id="@+id/share_app"
-        android:title="Share this App"
+        android:title="@string/share_app"
         app:showAsAction="never" />
     <item
         android:id="@+id/feedback"
-        android:title="Feedback"
+        android:title="@string/feedback"
         app:showAsAction="never" />
     <item
         android:id="@+id/version"
-        android:title="App Version"
+        android:title="@string/app_version"
         app:showAsAction="never" />
 </menu>

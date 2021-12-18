@@ -1,17 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_fragment_container"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/main_nav_graph" />
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:elevation="8dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/torchBtn">
 
-</LinearLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progress_circular"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/circular_shape"
+                android:indeterminate="false"
+                android:padding="30dp"
+                android:progressDrawable="@drawable/circular_progress_bar"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@id/playBtn"
+                app:layout_constraintStart_toStartOf="@id/playBtn"
+                app:layout_constraintEnd_toEndOf="@id/playBtn"
+                app:layout_constraintTop_toTopOf="@id/playBtn"
+                />
+
+            <ImageButton
+                android:id="@+id/playBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_color"
+                android:padding="20dp"
+                android:hapticFeedbackEnabled="true"
+                android:contentDescription="@string/turn_on_and_off_light"
+                android:src="@drawable/ic_play"
+                app:layout_constraintBottom_toTopOf="@id/lightSlider"
+                app:layout_constraintEnd_toStartOf="@id/timePicker"
+                app:layout_constraintStart_toEndOf="@id/sosBtn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/sosBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sos_background"
+                android:padding="20dp"
+                android:hapticFeedbackEnabled="true"
+                android:contentDescription="@string/sos"
+                android:src="@drawable/ic_sos"
+                app:layout_constraintBottom_toBottomOf="@id/playBtn"
+                app:layout_constraintEnd_toStartOf="@id/playBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/playBtn" />
+
+            <TextView
+                android:id="@+id/blinking_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blinking_speed"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnSecondary"
+                app:layout_constraintTop_toBottomOf="@id/lightSlider"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/lightSlider"
+                app:layout_constraintEnd_toEndOf="@id/lightSlider"
+                />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/lightSlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/slider_background"
+                android:stepSize="10.0"
+                android:valueFrom="0.0"
+                android:valueTo="90.0"
+                app:labelBehavior="floating"
+                app:layout_constraintTop_toBottomOf="@id/time_label"
+                app:layout_constraintBottom_toTopOf="@id/blinking_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:thumbColor="@color/yellow"
+                app:trackColor="@color/white" />
+
+            <TextView
+                android:id="@+id/time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blinking_time"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnSecondary"
+                app:layout_constraintTop_toBottomOf="@id/timePicker"
+                app:layout_constraintBottom_toTopOf="@id/lightSlider"
+                app:layout_constraintStart_toStartOf="@id/timePicker"
+                app:layout_constraintEnd_toEndOf="@id/timePicker"
+                />
+            <Spinner
+                android:id="@+id/timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"
+                android:gravity="center"
+                android:background="@drawable/spinner_background"
+                android:popupBackground="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/playBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/playBtn"
+                app:layout_constraintTop_toTopOf="@id/playBtn" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <ImageView
+        android:id="@+id/torchBtn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:padding="20dp"
+        android:src="@drawable/light_bulb_off"
+        app:layout_constraintBottom_toTopOf="@id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

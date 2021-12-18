@@ -13,12 +13,22 @@
     <string name="touch_sound_enable">Touch sound is enable</string>
     <string name="haptic_feedback_disable">Haptic feedback is disable</string>
     <string name="haptic_feedback_enable">Haptic feedback is enable</string>
+    <string name="shake_to_light_enable">Shake to light ON/OFF enable</string>
+    <string name="shake_to_light_disable">Shake to light ON/OFF disable</string>
+    <string name="settings">Settings</string>
+    <string name="more_apps">More Apps</string>
+    <string name="share_app">Share this App</string>
+    <string name="feedback">Feedback</string>
+    <string name="app_version">App Version</string>
+    <string name="blinking_speed">Blinking Speed</string>
+    <string name="blinking_time">Blinking Time</string>
     <string-array name="time_list">
+        <item>15 Second</item>
+        <item>30 Second</item>
         <item>1 Minute</item>
         <item>2 Minute</item>
         <item>5 Minute</item>
         <item>10 Minute</item>
         <item>15 Minute</item>
-        <item>30 Minute</item>
     </string-array>
 </resources>

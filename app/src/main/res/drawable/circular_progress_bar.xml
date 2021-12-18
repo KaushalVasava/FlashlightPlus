@@ -11,12 +11,6 @@
         android:thickness="15dp"
         android:useLevel="true">
         <solid android:color="@color/red" />
-<!--        <gradient-->
-<!--            android:angle="0"-->
-<!--            android:endColor="?attr/colorPrimary"-->
-<!--            android:startColor="#F7E30F"-->
-<!--            android:type="sweep"-->
-<!--            android:useLevel="false" />-->
     </shape>
 
 </rotate>
