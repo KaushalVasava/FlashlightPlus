@@ -9,4 +9,6 @@ internal const val SHAKE_TO_LIGHT = "shake_to_light"
 internal const val SOS_NUMBER = "sos_number"
 internal const val PHONE_REQUEST_CODE = 102
 internal const val READ_PHONE_STATE_REQUEST_CODE = 101
+internal const val CAMERA_REQUEST_CODE = 103
 internal const val PHONE_STATE_RECEIVED = "phone_state_received"
+internal const val SHAKE_SENSITIVITY = "shake_sensitivity"

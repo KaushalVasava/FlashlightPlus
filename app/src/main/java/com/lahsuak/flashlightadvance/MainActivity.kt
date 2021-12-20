@@ -11,13 +11,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.*
-import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.slider.Slider
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputEditText
 import com.lahsuak.flashlightadvance.util.*
 import com.lahsuak.flashlightadvance.util.BIG_FLASH_AS_SWITCH
 import com.lahsuak.flashlightadvance.util.FLASH_ON_START
@@ -32,106 +29,69 @@ import kotlin.math.roundToInt
 import android.graphics.SurfaceTexture
 import android.hardware.*
 import android.util.Log
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.lahsuak.flashlightadvance.fragments.FlashLightViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
 import kotlin.math.pow
 import kotlin.math.sqrt
-import android.net.ConnectivityManager
-import android.telephony.PhoneStateListener
 
 import android.telephony.TelephonyManager
 import android.content.Intent
+import com.lahsuak.flashlightadvance.databinding.ActivityMainBinding
+import com.lahsuak.flashlightadvance.databinding.FragmentSettingBinding
+import android.widget.Toast
 
+
+import android.content.IntentFilter
+import android.view.animation.AnimationUtils
 import android.content.BroadcastReceiver
-
 
 private const val TAG = "MainActivity"
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
-    private val SHAKE_THRESOLD = 3.25f
+class MainActivity : AppCompatActivity(), SensorEventListener{
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var settingBinding: FragmentSettingBinding
+    private var SHAKE_THRESOLD = 3.25f
     private val MIN_TIME_BETWEEN_SHAKES_MILLIsECS = 1000
     private var mLastShakeTime: Long = 0
     private lateinit var sensorManager: SensorManager
-    private lateinit var flashBtn: ImageView
-    private lateinit var playBtn: ImageButton
-    private lateinit var sosBtn: ImageButton
-    private lateinit var progressBar: ProgressBar
-    private lateinit var timePicker: Spinner
+
+    private lateinit var bottomSheetDialog: BottomSheetDialog
 
     //extra
     private var job: Job? = null
-    private lateinit var phoneStateReceiver: CallReceiver
-
-    //SOS settings
-    private lateinit var bottomSheetDialog: BottomSheetDialog
-    private lateinit var firstUser: TextInputEditText
-    private lateinit var hapticFeedbackSwitch: SwitchMaterial
-    private lateinit var touchSoundSwitch: SwitchMaterial
-    private lateinit var flashOnAtStartSwitch: SwitchMaterial
-    private lateinit var bigFlashSwitch: SwitchMaterial
-    private lateinit var shakeToLight: SwitchMaterial
-
+ //   private lateinit var phoneStateReceiver: CallReceiver
     private var state = false
     private var onOrOff = false
     private var isRunning = false
-    private var time = 1
     private var isHapticFeedBackEnable = true
     private var isSoundEnable = false
     private var flashOnAtStartUpEnable = false
     private var bigFlashAsSwitchEnable = false
     private var shakeToLightEnable = false
 
-    private lateinit var viewModel: FlashLightViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        flashBtn = findViewById(R.id.torchBtn)
-        val rangeSlider = findViewById<Slider>(R.id.lightSlider)
-        playBtn = findViewById(R.id.playBtn)
-        sosBtn = findViewById(R.id.sosBtn)
-        progressBar = findViewById(R.id.progress_circular)
-        timePicker = findViewById(R.id.timePicker)
+//        phoneStateReceiver = CallReceiver()
+//        val filter = IntentFilter()
+//        filter.addAction(TelephonyManager.EXTRA_STATE)
+//        registerReceiver(phoneStateReceiver, filter)
 
-        phoneStateReceiver = CallReceiver()
-        checkPhoneStatePermission()
-        val filter = IntentFilter(TelephonyManager.EXTRA_STATE)
-        registerReceiver(phoneStateReceiver, filter)
-
-        val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent) {
-                val b = intent.extras
-                val isState = b!!.getInt("message")
-//                if(isState == 0)
-//                {
-//                    switchingFlash(100)
-//                }else if(isState!=0){
-//
-//                }
-                Log.d("TAG", "in activity" + isState)
-            }
-        }
-        registerReceiver(broadcastReceiver, filter)
-
+        val myAnim = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+        binding.playBtn.animation = myAnim
+        binding.sosBtn.animation = myAnim
+        binding.phoneBtn.animation = myAnim
+        binding.torchBtn.animation = myAnim
         //this is for SOS settings
+        settingBinding = FragmentSettingBinding.inflate(layoutInflater)
+
         bottomSheetDialog = BottomSheetDialog(this)
-        bottomSheetDialog.setContentView(R.layout.fragment_setting)
-        firstUser = bottomSheetDialog.findViewById(R.id.first_number)!!
-        val addContactBtn = bottomSheetDialog.findViewById<Button>(R.id.addBtn)!!
-        val cancelBtn = bottomSheetDialog.findViewById<Button>(R.id.cancelBtn)!!
-        hapticFeedbackSwitch = bottomSheetDialog.findViewById(R.id.haptic_feedback)!!
-        touchSoundSwitch = bottomSheetDialog.findViewById(R.id.sound_feedback)!!
-        flashOnAtStartSwitch = bottomSheetDialog.findViewById(R.id.start_flash)!!
-        bigFlashSwitch = bottomSheetDialog.findViewById(R.id.big_flash_btn)!!
-        shakeToLight = bottomSheetDialog.findViewById(R.id.shake_to_light)!!
+        bottomSheetDialog.setContentView(settingBinding.root)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-
-        viewModel = ViewModelProvider(this).get(FlashLightViewModel::class.java)
 
         //Shake to turn ON/OFF flashlight
         val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -139,61 +99,54 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
         }
 
-        viewModel.getLightData().observe(this, { isLightOn ->
-            state = isLightOn
-            if (state)
-                turnFlash(true)
-            else
-                turnFlash(false)
-        })
-        viewModel.getLightData().observe(this, { isRun ->
-            isRunning = isRun
-        })
-
-//        if (savedInstanceState != null) {
-//            state = savedInstanceState.getBoolean("isFlashOn", false)
-//            if (state)
-//                turnFlash(true)
-//            else
-//                turnFlash(false)
-//        }
+        //check permissions
+        checkBothPermissions()
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.M)
+            checkCameraPermission()
 
         //Flash light fragment methods
         //flashlight blinking time
-        setTime()
         checkSwitch()
 
+        binding.blinkingLabel.text = getString(R.string.blinking_speed,0)
         if (flashOnAtStartUpEnable) {
             turnFlash(true)
         }
 
-        sosBtn.setOnClickListener {
+        binding.phoneBtn.setOnClickListener {
+            it.startAnimation(myAnim)
+            checkPhoneStatePermission()
+        }
+        binding.sosBtn.setOnClickListener {
+            it.startAnimation(myAnim)
+            checkPermission()
             if (isSoundEnable) {
                 playSound()
             }
             if (isHapticFeedBackEnable) {
-                hapticFeedback(sosBtn)
+                hapticFeedback(binding.sosBtn)
             }
-            switchingFlash(100)
-            checkPermission()
         }
-        flashBtn.setOnClickListener {
+        binding.torchBtn.setOnClickListener {
             if (bigFlashAsSwitchEnable) {
+                it.startAnimation(myAnim)
                 startFlash()
             }
         }
-        playBtn.setOnClickListener {
+        binding.playBtn.setOnClickListener {
+            it.startAnimation(myAnim)
             startFlash()
         }
 
-        rangeSlider.addOnSliderTouchListener(
+        binding.lightSlider.addOnSliderTouchListener(
             object : Slider.OnSliderTouchListener {
                 override fun onStartTrackingTouch(slider: Slider) {
                 }
 
                 override fun onStopTrackingTouch(slider: Slider) {
+                    binding.blinkingLabel.text = getString(R.string.blinking_speed,slider.value.roundToInt()/10)
                     if (isHapticFeedBackEnable) {
-                        hapticFeedback(rangeSlider)
+                        hapticFeedback(binding.lightSlider)
                     }
                     if (isSoundEnable) {
                         playSound()
@@ -203,7 +156,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             onOrOff = true
                             delay(500)
                             if (slider.value.roundToInt() > 0) {
-                                switchingFlash(slider.value.roundToInt())
+                                switchingFlash(slider.value.roundToInt()/10)
                             } else if (slider.value.roundToInt() == 0) {
                                 turnFlash(true)
                             }
@@ -211,14 +164,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     } else {
                         onOrOff = false
                         if (slider.value.roundToInt() > 0) {
-                            switchingFlash(slider.value.roundToInt())
+                            switchingFlash(slider.value.roundToInt()/10)
                         } else if (slider.value.roundToInt() == 0) {
                             turnFlash(true)
                         }
                     }
                 }
             })
-        rangeSlider.setLabelFormatter { value: Float ->
+        binding.lightSlider.setLabelFormatter { value: Float ->
             val format = NumberFormat.getInstance()
             format.maximumFractionDigits = 0
             //format.currency = Currency.getInstance("USD")
@@ -227,74 +180,91 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         //Settings methods
 
-        hapticFeedbackSwitch.setOnCheckedChangeListener { _, isChecked ->
+        settingBinding.sensitivity.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
+            SHAKE_THRESOLD = value
+            settingBinding.txtSensitivity.text = getString(R.string.sensitivity,SHAKE_THRESOLD)
+            if (isHapticFeedBackEnable) {
+                hapticFeedback(settingBinding.sensitivity)
+            }
+            if (isSoundEnable) {
+                playSound()
+            }
+        })
+        settingBinding.hapticFeedback.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                hapticFeedbackSwitch.isChecked = false
-                hapticFeedbackSwitch.text = getString(R.string.haptic_feedback_disable)
+                settingBinding.hapticFeedback.isChecked = false
+                settingBinding.hapticFeedback.text = getString(R.string.haptic_feedback_disable)
                 isHapticFeedBackEnable = false
             } else {
-                hapticFeedbackSwitch.isChecked = true
-                hapticFeedbackSwitch.text = getString(R.string.haptic_feedback_enable)
+                settingBinding.hapticFeedback.isChecked = true
+                settingBinding.hapticFeedback.text = getString(R.string.haptic_feedback_enable)
                 isHapticFeedBackEnable = true
             }
         }
-        touchSoundSwitch.setOnCheckedChangeListener { _, isChecked ->
+        settingBinding.soundFeedback.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                touchSoundSwitch.isChecked = false
-                touchSoundSwitch.text = getString(R.string.touch_sound_disable)
+                settingBinding.soundFeedback.isChecked = false
+                settingBinding.soundFeedback.text = getString(R.string.touch_sound_disable)
                 isSoundEnable = false
             } else {
-                touchSoundSwitch.isChecked = true
-                touchSoundSwitch.text = getString(R.string.touch_sound_enable)
+                settingBinding.soundFeedback.isChecked = true
+                settingBinding.soundFeedback.text = getString(R.string.touch_sound_enable)
                 isSoundEnable = true
             }
         }
-        flashOnAtStartSwitch.setOnCheckedChangeListener { _, isChecked ->
+        settingBinding.startFlash.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                flashOnAtStartSwitch.isChecked = false
-                flashOnAtStartSwitch.text = getString(R.string.flash_off_at_start)
+                settingBinding.startFlash.isChecked = false
+                settingBinding.startFlash.text = getString(R.string.flash_off_at_start)
                 flashOnAtStartUpEnable = false
             } else {
-                flashOnAtStartSwitch.isChecked = true
-                flashOnAtStartSwitch.text = getString(R.string.flash_on_at_start)
+                settingBinding.startFlash.isChecked = true
+                settingBinding.startFlash.text = getString(R.string.flash_on_at_start)
                 flashOnAtStartUpEnable = true
             }
         }
-        bigFlashSwitch.setOnCheckedChangeListener { _, isChecked ->
+        settingBinding.bigFlashBtn.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                bigFlashSwitch.isChecked = false
-                bigFlashSwitch.text = getString(R.string.big_flash_disable)
+                settingBinding.bigFlashBtn.isChecked = false
+                settingBinding.bigFlashBtn.text = getString(R.string.big_flash_disable)
                 bigFlashAsSwitchEnable = false
             } else {
-                bigFlashSwitch.isChecked = true
-                bigFlashSwitch.text = getString(R.string.big_flash_enable)
+                settingBinding.bigFlashBtn.isChecked = true
+                settingBinding.bigFlashBtn.text = getString(R.string.big_flash_enable)
                 bigFlashAsSwitchEnable = true
             }
         }
-        shakeToLight.setOnCheckedChangeListener { _, isChecked ->
+        settingBinding.shakeToLight.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                shakeToLight.isChecked = false
-                shakeToLight.text = getString(R.string.shake_to_light_disable)
+                settingBinding.shakeToLight.isChecked = false
+                settingBinding.shakeToLight.text = getString(R.string.shake_to_light_disable)
                 shakeToLightEnable = false
             } else {
-                shakeToLight.isChecked = true
-                shakeToLight.text = getString(R.string.shake_to_light_enable)
+                settingBinding.shakeToLight.isChecked = true
+                settingBinding.shakeToLight.text = getString(R.string.shake_to_light_enable)
                 shakeToLightEnable = true
             }
         }
-        addContactBtn.setOnClickListener {
+
+        settingBinding.addBtn.setOnClickListener {
             val preference = getSharedPreferences(SETTING_DATA, MODE_PRIVATE)
             val sosNo = preference.getString(SOS_NUMBER, null)
 
-            if (!firstUser.text.isNullOrEmpty()) {
+            if (!settingBinding.sosNumber.text.isNullOrEmpty() &&
+                settingBinding.sosNumber.text.toString().length == 10
+            ) {
                 saveSetting()
-                if (sosNo != firstUser.text.toString())
+                if (sosNo != settingBinding.sosNumber.text.toString()) {
                     notifyUser(this, "Contact is successfully added")
+                    checkBothPermissions()
+                    binding.sosBtn.setImageResource(R.drawable.ic_sos)
+                }
                 bottomSheetDialog.dismiss()
+
             } else
-                notifyUser(this, "Please fill up all details")
+                notifyUser(this, "Please enter SOS Number!")
         }
-        cancelBtn.setOnClickListener {
+        settingBinding.cancelBtn.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
 
@@ -320,7 +290,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             R.id.feedback -> {
                 sendFeedbackMail()
             }
-            // R.id.version ->item.title = "Current Version ${BuildConfig.VERSION_NAME}"
         }
         return super.onOptionsItemSelected(item)
     }
@@ -329,29 +298,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         isRunning = true
         onOrOff = false
         var flashOn = true
-        progressBar.max = time * 60
-        playBtn.setImageResource(R.drawable.ic_pause)
+        binding.playBtn.setImageResource(R.drawable.ic_pause)
         turnFlash(flashOn)
-        var time1 = 0.0
+
         job = lifecycleScope.launch {
-            for (count in 0 until time * 60 * noOfTimes) {
-                if (time1 >= time * 60.0) {
-                    turnFlash(false)
-                    isRunning = false
-                    break
-                }
-                val time2: Double =
-                    60 / (time * noOfTimes * 6).toDouble()  //this is for slider progress
-
+            for (count in 0 until 10000) {
+                val delayTime = (1000 / noOfTimes).toDouble()
                 flashOn = !flashOn
-                val delayTime = 10000 / noOfTimes
-                if (noOfTimes != 100) {
-                    time1 += time2 + noOfTimes / 100
-                }
-                progressBar.progress = time1.toInt()//count/time1.toInt()
-
                 delay(delayTime.toLong())
-
                 turnFlash(flashOn)
                 //check whether user pause the timer or not
                 if (onOrOff) {
@@ -374,8 +328,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val cameraId = cameraManager.cameraIdList[0]
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     cameraManager.setTorchMode(cameraId, isCheck)
-                } else {
-                    //cameraManager.setTorchMode(cameraId,isChek)
+                } else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+
                     val mCam = Camera.open()
                     val p: Camera.Parameters = mCam.parameters
                     p.flashMode = Camera.Parameters.FLASH_MODE_TORCH
@@ -390,21 +344,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
                 state = isCheck
                 if (isCheck) {
-                    flashBtn.setImageResource(R.drawable.light_bulb)
+                    binding.torchBtn.setImageResource(R.drawable.light_bulb)
                     // if (!isRunning)
-                    playBtn.setImageResource(R.drawable.ic_pause)
+                    binding.playBtn.setImageResource(R.drawable.ic_pause)
                 } else {
-                    flashBtn.setImageResource(R.drawable.light_bulb_off)
+                    binding.torchBtn.setImageResource(R.drawable.light_bulb_off)
                     // if (!isRunning)
-                    playBtn.setImageResource(R.drawable.ic_play)
+                    binding.playBtn.setImageResource(R.drawable.ic_play)
                 }
             } catch (e: CameraAccessException) {
             }
         }
     }
 
+
     private fun runFlashlight() {
-        progressBar.progress = 0
         if (!state) {
             turnFlash(true)
         } else {
@@ -418,21 +372,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             playSound()
         }
         if (isHapticFeedBackEnable) {
-            hapticFeedback(playBtn)
+            hapticFeedback(binding.playBtn)
         }
         runFlashlight()
         if (isRunning) {
             if (onOrOff) {
                 onOrOff = false
-                //playBtn.setImageResource(R.drawable.ic_pause)
+                //binding.playBtn.setImageResource(R.drawable.ic_pause)
             } else {
                 onOrOff = true
-                playBtn.setImageResource(R.drawable.ic_play)
+                binding.playBtn.setImageResource(R.drawable.ic_play)
             }
             isRunning = false
             job?.cancel()
             turnFlash(false)
-            playBtn.setImageResource(R.drawable.ic_play)
+            binding.playBtn.setImageResource(R.drawable.ic_play)
         }
     }
 
@@ -444,43 +398,67 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         flashOnAtStartUpEnable = preference.getBoolean(FLASH_ON_START, false)
         bigFlashAsSwitchEnable = preference.getBoolean(BIG_FLASH_AS_SWITCH, false)
         shakeToLightEnable = preference.getBoolean(SHAKE_TO_LIGHT, false)
+        SHAKE_THRESOLD = preference.getFloat(SHAKE_SENSITIVITY,3.25f)
         val sosNo = preference.getString(SOS_NUMBER, null)
-        firstUser.setText(sosNo)
+        settingBinding.sosNumber.setText(sosNo)
 
         if (isHapticFeedBackEnable) {
-            hapticFeedbackSwitch.isChecked = true
-            hapticFeedbackSwitch.text = getString(R.string.haptic_feedback_enable)
+            settingBinding.hapticFeedback.isChecked = true
+            settingBinding.hapticFeedback.text = getString(R.string.haptic_feedback_enable)
         } else {
-            hapticFeedbackSwitch.isChecked = false
-            hapticFeedbackSwitch.text = getString(R.string.haptic_feedback_disable)
+            settingBinding.hapticFeedback.isChecked = false
+            settingBinding.hapticFeedback.text = getString(R.string.haptic_feedback_disable)
         }
         if (isSoundEnable) {
-            touchSoundSwitch.isChecked = true
-            touchSoundSwitch.text = getString(R.string.touch_sound_enable)
+            settingBinding.soundFeedback.isChecked = true
+            settingBinding.soundFeedback.text = getString(R.string.touch_sound_enable)
         } else {
-            touchSoundSwitch.isChecked = false
-            touchSoundSwitch.text = getString(R.string.touch_sound_disable)
+            settingBinding.soundFeedback.isChecked = false
+            settingBinding.soundFeedback.text = getString(R.string.touch_sound_disable)
         }
         if (flashOnAtStartUpEnable) {
-            flashOnAtStartSwitch.isChecked = true
-            flashOnAtStartSwitch.text = getString(R.string.flash_on_at_start)
+            settingBinding.startFlash.isChecked = true
+            settingBinding.startFlash.text = getString(R.string.flash_on_at_start)
         } else {
-            flashOnAtStartSwitch.isChecked = false
-            flashOnAtStartSwitch.text = getString(R.string.flash_off_at_start)
+            settingBinding.startFlash.isChecked = false
+            settingBinding.startFlash.text = getString(R.string.flash_off_at_start)
         }
         if (bigFlashAsSwitchEnable) {
-            bigFlashSwitch.isChecked = true
-            bigFlashSwitch.text = getString(R.string.big_flash_enable)
+            settingBinding.bigFlashBtn.isChecked = true
+            settingBinding.bigFlashBtn.text = getString(R.string.big_flash_enable)
         } else {
-            bigFlashSwitch.isChecked = false
-            bigFlashSwitch.text = getString(R.string.big_flash_disable)
+            settingBinding.bigFlashBtn.isChecked = false
+            settingBinding.bigFlashBtn.text = getString(R.string.big_flash_disable)
         }
         if (shakeToLightEnable) {
-            shakeToLight.isChecked = true
-            shakeToLight.text = getString(R.string.shake_to_light_enable)
+            settingBinding.shakeToLight.isChecked = true
+            settingBinding.shakeToLight.text = getString(R.string.shake_to_light_enable)
         } else {
-            shakeToLight.isChecked = false
-            shakeToLight.text = getString(R.string.shake_to_light_disable)
+            settingBinding.shakeToLight.isChecked = false
+            settingBinding.shakeToLight.text = getString(R.string.shake_to_light_disable)
+        }
+        settingBinding.txtSensitivity.text = getString(R.string.sensitivity,SHAKE_THRESOLD)
+        settingBinding.sensitivity.value = SHAKE_THRESOLD
+    }
+
+    private fun checkBothPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CALL_PHONE
+            ) == PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            binding.phoneBtn.setImageResource(R.drawable.ic_call)
+            val preference = getSharedPreferences(SETTING_DATA, MODE_PRIVATE)
+            val sosNo = preference.getString(SOS_NUMBER, null)
+            if (sosNo != null) {
+                binding.sosBtn.setImageResource(R.drawable.ic_sos)
+            }else{
+                binding.sosBtn.setImageResource(R.drawable.ic_sos_off)
+            }
         }
     }
 
@@ -495,6 +473,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 arrayOf(Manifest.permission.READ_PHONE_STATE),
                 READ_PHONE_STATE_REQUEST_CODE
             )
+        } else {
+            notifyUser(this,"Flash light will blinking whenever call arrived")
+            binding.phoneBtn.setImageResource(R.drawable.ic_call)
+        }
+    }
+
+    private fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                CAMERA_REQUEST_CODE
+            )
+        } else {
+          //dff
+            Log.d(TAG, "checkCameraPermission: allowed")
         }
     }
 
@@ -530,68 +528,33 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         if (requestCode == READ_PHONE_STATE_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                notifyUser(this, "Flash will blinking when call arrived")
+                binding.phoneBtn.setImageResource(R.drawable.ic_call)
+                notifyUser(this, "Now Flash will blinking whenever call arrived")
             } else {
                 notifyUser(this, "Phone state Permission Denied")
             }
         }
-    }
-
-    private fun setTime() {
-        val sortAdapter: ArrayAdapter<*> = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            resources.getStringArray(R.array.time_list)
-        )
-        sortAdapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item
-        )
-        timePicker.adapter = sortAdapter
-
-        var order = 0
-        //we need by default selected sort when app start
-        timePicker.setSelection(order)
-
-        //pass view:View? for null reference
-        timePicker.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-
-                override fun onItemSelected(
-                    adapterView: AdapterView<*>,
-                    view: View?, item: Int, l: Long
-                ) {
-                    if (order != item) {
-                        order = item
-                        when (order) {
-                            0 -> time = 1
-                            1 -> time = 2
-                            2 -> time = 5
-                            3 -> time = 10
-                            4 -> time = 15
-                            5 -> time = 30
-                            6 -> time = 45
-                            7 -> time = 60
-//                            0 -> time = 15
-//                            1 -> time = 30
-//                            2 -> time = 60
-//                            3 -> time = 2 * 60
-//                            4 -> time = 5 * 60
-//                            5 -> time = 10 * 60
-//                            6 -> time = 15 * 60
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+        if(requestCode== CAMERA_REQUEST_CODE){
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                notifyUser(this, "Flash light feature now working")
+            } else {
+                notifyUser(this, "Camera Permission Denied!,Camera permission needed for flashlight")
             }
+        }
     }
 
     private fun phoneCall() {
-        val callIntent = Intent(Intent.ACTION_CALL)
         val pref = getSharedPreferences(SETTING_DATA, MODE_PRIVATE)
         val phNo1 = pref.getString(SOS_NUMBER, null)
-        callIntent.data = Uri.parse("tel: $phNo1")
-        startActivity(callIntent)
+        if (phNo1.isNullOrEmpty()) {
+            notifyUser(this, "Please add SOS phone number from Settings")
+        } else {
+            binding.sosBtn.setImageResource(R.drawable.ic_sos)
+            switchingFlash(10)
+            val callIntent = Intent(Intent.ACTION_CALL)
+            callIntent.data = Uri.parse("tel: $phNo1")
+            startActivity(callIntent)
+        }
     }
 
     private fun playSound() {
@@ -663,10 +626,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         editor.putBoolean(FLASH_ON_START, flashOnAtStartUpEnable)
         editor.putBoolean(BIG_FLASH_AS_SWITCH, bigFlashAsSwitchEnable)
         editor.putBoolean(SHAKE_TO_LIGHT, shakeToLightEnable)
-        editor.putString(SOS_NUMBER, firstUser.text.toString())
+        editor.putString(SOS_NUMBER, settingBinding.sosNumber.text.toString())
+        editor.putFloat(SHAKE_SENSITIVITY,SHAKE_THRESOLD)
         editor.apply()
     }
-
 
     private fun notifyUser(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -674,11 +637,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.setLightData(state)
-        viewModel.setRunningData(isRunning)
         sensorManager.unregisterListener(this)
-        unregisterReceiver(phoneStateReceiver)
-//        viewModel._lightData.value=state
+        //unregisterReceiver(phoneStateReceiver)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -691,7 +651,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     val z = event.values[2]
                     val acceleration =
                         sqrt(x.pow(2) + y.pow(2) + z.pow(2)) - SensorManager.GRAVITY_EARTH
-                    //  Log.d(TAG, "onSensorChanged:Acceleration is $acceleration")
                     if (shakeToLightEnable) {
                         if (acceleration > SHAKE_THRESOLD) {
                             mLastShakeTime = curTime
@@ -709,36 +668,5 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
-
-//    override fun onIncomingCall(callState: Boolean) {
-//        if(callState){
-//            switchingFlash(100)
-//        }
-//    }
-//
-//    override fun onCallReceived(callState: Boolean) {
-//        if(!callState){
-//            turnFlash(false)
-//        }
-//    }
-//      class CallReceiver : BroadcastReceiver(){
-//        override fun onReceive(context: Context?, intent: Intent?) {
-//            val telephoneManager = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-//
-//            telephoneManager.listen(object : PhoneStateListener() {
-//                override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-//                    super.onCallStateChanged(state, phoneNumber)
-//                    if(state==1) {
-//                        switchingFlash(100)
-//                        //listener.onIncomingCall(isCallArrived)
-//                    }
-//                    else{
-//                        turnFlash(false)
-//                    }
-//                    Log.d("TAG", "onCallStateChanged: incoming call $phoneNumber  and state $state")
-//                }
-//            }, PhoneStateListener.LISTEN_CALL_STATE)
-//        }
-//    }
 
 }

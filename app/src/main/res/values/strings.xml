@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Flashlight Plus</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="turn_on_and_off_light">Turn on and off light</string>
     <string name="feedback_email">kaushalvasava.app.feedback@gmail.com</string>
     <string name="sos">SOS</string>
@@ -20,8 +18,21 @@
     <string name="share_app">Share this App</string>
     <string name="feedback">Feedback</string>
     <string name="app_version">App Version</string>
-    <string name="blinking_speed">Blinking Speed</string>
+    <string name="blinking_speed">Blinking Speed : %d</string>
     <string name="blinking_time">Blinking Time</string>
+    <string name="enter_sos_number">Enter SOS Number</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="sensitivity">Shake Sensitivity : %.2f</string>
+    <string name="incoming_call">Incoming call flash light</string>
+    <string name="light_blinking_speed">Flash light blinking speed</string>
+    <string name="flash_light">Flash Light</string>
+    <string name="shake_sensitivity">Shake Sensitivity</string>
+    <string name="haptic_feedback_setting">Haptic Feedback setting</string>
+    <string name="sound_effect_setting">Sound effect setting</string>
+    <string name="flash_light_start_setting">Flash light start when app start setting</string>
+    <string name="big_lamp_setting">Big lamp as a switch setting</string>
+    <string name="shake_to_light_setting">Shake to turn ON or OFF light setting</string>
     <string-array name="time_list">
         <item>15 Second</item>
         <item>30 Second</item>
