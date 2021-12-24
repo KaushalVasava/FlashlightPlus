@@ -9,8 +9,8 @@ Easy to use flashlight app.
 +Haptic feedback and touch sound
 +SOS call feature
 
-Checkout this app on playstore
-[![playstore_logo (1)](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
+Checkout this app on playstore!
+[Uploading playstore_icon.jfif…](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
 
 
 ![image1](https://user-images.githubusercontent.com/49050597/147363708-c1d86e19-ee94-4395-8dcf-11c16583ad8e.jpeg)
