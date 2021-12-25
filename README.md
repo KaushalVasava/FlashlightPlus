@@ -10,7 +10,7 @@ Easy to use flashlight app.
 +SOS call feature
 
 Checkout this app on playstore!!
-[ic_playstore](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
+![ic_playstore(https://user-images.githubusercontent.com/49050597/147382907-426dfbd0-7125-4a4e-8d79-ed4510b6062a.png)](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
 
 
 ![image1](https://user-images.githubusercontent.com/49050597/147363708-c1d86e19-ee94-4395-8dcf-11c16583ad8e.jpeg)
