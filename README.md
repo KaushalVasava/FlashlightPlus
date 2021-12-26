@@ -14,10 +14,8 @@ Checkout this app on playstore!!
 [![ic_playstore_github](https://user-images.githubusercontent.com/49050597/147382966-9832459a-facf-4740-8aad-6fc9b1d25735.png)](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
 
 ![image_1](https://user-images.githubusercontent.com/49050597/147405196-1e45790b-a81d-4146-9137-c4b06498c626.jpg)
-
-![image2](https://user-images.githubusercontent.com/49050597/147363710-40c0233e-b7b4-4fa6-b0f0-fc09988fca53.jpeg)
-![image3](https://user-images.githubusercontent.com/49050597/147363711-c1a8ccf2-4471-4d4e-8850-2bf48c291f85.jpeg)
-![image4](https://user-images.githubusercontent.com/49050597/147363712-91ec0503-f784-4fab-916e-e5a2b9270fbe.jpeg)
-![image5](https://user-images.githubusercontent.com/49050597/147363713-5f8112ff-6917-4f5c-9d0e-e11f764336e4.jpeg)
-![image6](https://user-images.githubusercontent.com/49050597/147363714-ed7eb091-cc0d-4dbc-854f-8ae8b72968dd.jpeg)
-![image7](https://user-images.githubusercontent.com/49050597/147363715-67fbb089-4e42-45e4-8123-60f1775fd687.jpeg)
+![image2](https://user-images.githubusercontent.com/49050597/147405246-3df2e28e-9da5-457c-8cf9-abfef41ff19d.jpg)
+![image5](https://user-images.githubusercontent.com/49050597/147405247-02a49066-49f1-4a85-8123-8a6781f11ed5.jpg)
+![image7](https://user-images.githubusercontent.com/49050597/147405248-1a8687e1-9aec-4835-80a7-95f775cafa9b.jpg)
+![image4](https://user-images.githubusercontent.com/49050597/147405249-ba3e0aec-b919-403e-804b-446d5edb3159.jpg)
+![image3](https://user-images.githubusercontent.com/49050597/147405250-211347e5-d34c-4ccc-b156-7ee5297770f9.jpg)
