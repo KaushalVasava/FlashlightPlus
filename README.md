@@ -14,7 +14,7 @@ Checkout this app on playstore!!
 [![ic_playstore_github](https://user-images.githubusercontent.com/49050597/147382966-9832459a-facf-4740-8aad-6fc9b1d25735.png)](https://play.google.com/store/apps/details?id=com.lahsuak.flashlightplus)
 
 
-![image1](https://user-images.githubusercontent.com/49050597/147363708-c1d86e19-ee94-4395-8dcf-11c16583ad8e.jpeg)
+![image1](https://user-images.githubusercontent.com/49050597/147405149-0aff1344-c4b9-4af3-a792-6983d701c6b4.jpg)
 ![image2](https://user-images.githubusercontent.com/49050597/147363710-40c0233e-b7b4-4fa6-b0f0-fc09988fca53.jpeg)
 ![image3](https://user-images.githubusercontent.com/49050597/147363711-c1a8ccf2-4471-4d4e-8850-2bf48c291f85.jpeg)
 ![image4](https://user-images.githubusercontent.com/49050597/147363712-91ec0503-f784-4fab-916e-e5a2b9270fbe.jpeg)
